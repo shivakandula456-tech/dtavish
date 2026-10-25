@@ -287,6 +287,9 @@
       if (btn.closest('#shopFilters')) return;
       btn.addEventListener('click', resetAll);
     });
+    // Handle the Reset control inside the filter panel explicitly.
+    var filterReset = T.qs('#shopFilters [data-reset-filters]');
+    if (filterReset) filterReset.addEventListener('click', resetAll);
 
     var panel = T.qs('#shopFilters');
     var toggle = T.qs('[data-filter-toggle]');
@@ -327,6 +330,8 @@
   }
 
   function resetAll() {
+    // Clear unapplied mobile filters so Apply cannot restore stale selections.
+    pendingState = null;
     state.category = [];
     state.sub = [];
     state.flag = [];
