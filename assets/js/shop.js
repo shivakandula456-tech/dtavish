@@ -287,6 +287,10 @@
       if (btn.closest('#shopFilters')) return;
       btn.addEventListener('click', resetAll);
     });
+    // The panel Reset control is intentionally handled separately: mobile
+    // filter controls may hold a pending draft that must be cleared too.
+    var filterReset = T.qs('#shopFilters [data-reset-filters]');
+    if (filterReset) filterReset.addEventListener('click', resetAll);
 
     var panel = T.qs('#shopFilters');
     var toggle = T.qs('[data-filter-toggle]');
@@ -327,6 +331,8 @@
   }
 
   function resetAll() {
+    // Discard any unapplied mobile filter draft so Apply cannot restore old values.
+    pendingState = null;
     state.category = [];
     state.sub = [];
     state.flag = [];
