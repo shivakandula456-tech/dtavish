@@ -381,7 +381,7 @@
       var imgs = (p && p.images) || [];
       var valid = imgs.filter(function (i) { return typeof i === 'string' && i.trim(); });
       if (valid.length < 1) errors.push('At least 1 product image is required.');
-      if (valid.length > 4) errors.push('A maximum of 4 product images is allowed.');
+      if (valid.length > 12) errors.push('A maximum of 12 product images are allowed.');
       if (p && p.salePrice && num(p.salePrice, 0) > num(p.price, 0)) errors.push('Sale price cannot be higher than the price.');
       return errors;
     },
