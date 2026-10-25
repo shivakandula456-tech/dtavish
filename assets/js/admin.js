@@ -475,9 +475,9 @@
 
     function updateImageCount() {
       var count = qs('[data-image-count]');
-      if (count) count.textContent = images.length + ' of 4 images';
+      if (count) count.textContent = images.length + ' of 12 images';
       var upload = qs('[data-product-upload-input]');
-      if (upload) upload.disabled = images.length >= 4;
+      if (upload) upload.disabled = images.length >= 12;
     }
 
     if (picker) {
@@ -513,7 +513,7 @@
         if (!btn) return;
         var src = btn.getAttribute('data-lib-add');
         if (images.indexOf(src) > -1) { T.toast('Already added', 'error'); return; }
-        if (images.length >= 4) { T.toast('Maximum 4 images per product. Remove one before adding another.', 'error'); return; }
+        if (images.length >= 12) { T.toast('Maximum 12 images per product. Remove one before adding another.', 'error'); return; }
         images.push(src);
         renderImages();
         renderChecklist();
@@ -527,7 +527,7 @@
         var src = customInput.value.trim();
         if (!src) return;
         if (images.indexOf(src) > -1) { T.toast('Already added', 'error'); return; }
-        if (images.length >= 4) { T.toast('Maximum 4 images per product. Remove one before adding another.', 'error'); return; }
+        if (images.length >= 12) { T.toast('Maximum 12 images per product. Remove one before adding another.', 'error'); return; }
         images.push(src);
         customInput.value = '';
         renderImages();
@@ -580,10 +580,10 @@
       var files = Array.prototype.slice.call(uploadInput.files || []);
       uploadInput.value = '';
       if (!files.length) return;
-      var available = 4 - images.length;
+      var available = 12 - images.length;
       if (files.length > available) {
-        setUploadStatus('You can add ' + available + ' more image(s). Maximum is 4 per product.', true);
-        T.toast('Maximum 4 images per product', 'error');
+        setUploadStatus('You can add ' + available + ' more image(s). Maximum is 12 per product.', true);
+        T.toast('Maximum 12 images per product', 'error');
         return;
       }
       uploadInput.disabled = true;
@@ -617,7 +617,7 @@
         { ok: !!String(p.sku || '').trim(), label: 'SKU' },
         { ok: !!p.category, label: 'Category' },
         { ok: num(p.price, 0) > 0, label: 'Price above ₹0' },
-        { ok: (p.images || []).filter(function (i) { return i && String(i).trim(); }).length >= 1 && (p.images || []).length <= 4, label: '1–4 product images (' + (p.images || []).length + ' added)' },
+        { ok: (p.images || []).filter(function (i) { return i && String(i).trim(); }).length >= 1 && (p.images || []).length <= 12, label: '1–12 product images (' + (p.images || []).length + ' added)' },
         { ok: !p.salePrice || num(p.salePrice, 0) <= num(p.price, 0), label: 'Sale price ≤ price' },
         { ok: errs.length === 0, label: 'Ready to publish' }
       ];
@@ -690,9 +690,9 @@
 
     async function save() {
       var data = collect();
-      if (!data.images.length || data.images.length > 4) {
-        if (errBox) { errBox.hidden = false; errBox.textContent = !data.images.length ? 'Add at least one product image before saving.' : 'A maximum of four product images is allowed. Remove an image before saving.'; }
-        T.toast(!data.images.length ? 'Add at least one product image' : 'Maximum 4 product images', 'error');
+      if (!data.images.length || data.images.length > 12) {
+        if (errBox) { errBox.hidden = false; errBox.textContent = !data.images.length ? 'Add at least one product image before saving.' : 'A maximum of twelve product images is allowed. Remove an image before saving.'; }
+        T.toast(!data.images.length ? 'Add at least one product image' : 'Maximum 12 product images', 'error');
         return null;
       }
       // SKU and slug must remain unique so product lookup, cart links and
@@ -708,14 +708,18 @@
       }
       var errors = store.products.validate(data);
       var requested = data.status;
-      if (errors.length && requested === 'ACTIVE') {
+      var intentionalNonPublicStatus = ['HIDDEN', 'TRASH', 'OUT_OF_STOCK'].indexOf(requested) > -1;
+      if (errors.length) {
         data.status = 'DRAFT';
         if (errBox) {
           errBox.hidden = false;
-          errBox.innerHTML = 'Saved as <strong>draft</strong> — resolve to publish: <ul style="margin: .4rem 0 0 1.1rem;">' +
+          errBox.innerHTML = 'Saved as <strong>draft</strong> — complete required fields to publish: <ul style="margin: .4rem 0 0 1.1rem;">' +
             errors.map(function (e) { return '<li>' + esc(e) + '</li>'; }).join('') + '</ul>';
         }
-        T.toast('Saved as draft — publish requirements not met', 'error');
+        T.toast('Saved as draft — required fields are incomplete', 'error');
+      } else if (!intentionalNonPublicStatus) {
+        data.status = 'ACTIVE';
+        if (errBox) errBox.hidden = true;
       } else {
         if (errBox) errBox.hidden = true;
       }
@@ -760,7 +764,7 @@
       }
       if (errBox && requested !== 'ACTIVE' && data.status === 'DRAFT') {
         errBox.hidden = false;
-        errBox.textContent = 'Product saved as a draft. To show it in the storefront in this browser, resolve the publishing checklist and set Status to Active.';
+        errBox.textContent = 'Product saved as a draft because required fields are incomplete. Complete the checklist and save again to publish.';
       }
       renderChecklist();
       return saved;

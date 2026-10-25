@@ -352,8 +352,8 @@
     setStatus: function (id, status) {
       var p = products.get(id);
       if (!p) return null;
-      if (status === PUB_STATUS && (!p.images || p.images.length < 1 || p.images.length > 4)) {
-        return { error: 'A product needs between 1 and 4 valid images before it can be published.' };
+      if (status === PUB_STATUS && (!p.images || p.images.length < 1 || p.images.length > 12)) {
+        return { error: 'A product needs between 1 and 12 valid images before it can be published.' };
       }
       var updated = products.update(id, { status: status }, false);
       var labels = { ACTIVE: 'Product published', DRAFT: 'Product unpublished', HIDDEN: 'Product hidden', TRASH: 'Product moved to trash', OUT_OF_STOCK: 'Product marked out of stock' };
@@ -381,7 +381,7 @@
       var imgs = (p && p.images) || [];
       var valid = imgs.filter(function (i) { return typeof i === 'string' && i.trim(); });
       if (valid.length < 1) errors.push('At least 1 product image is required.');
-      if (valid.length > 4) errors.push('A maximum of 4 product images is allowed.');
+      if (valid.length > 12) errors.push('A maximum of 12 product images are allowed.');
       if (p && p.salePrice && num(p.salePrice, 0) > num(p.price, 0)) errors.push('Sale price cannot be higher than the price.');
       return errors;
     },
