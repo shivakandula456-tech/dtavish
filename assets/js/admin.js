@@ -764,7 +764,7 @@
       }
       if (errBox && requested !== 'ACTIVE' && data.status === 'DRAFT') {
         errBox.hidden = false;
-        errBox.textContent = 'Product saved as a draft. To show it in the storefront in this browser, resolve the publishing checklist and set Status to Active.';
+        errBox.textContent = 'Product saved as a draft because required fields are incomplete. Complete the checklist and save again to publish.';
       }
       renderChecklist();
       return saved;
