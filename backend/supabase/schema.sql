@@ -40,7 +40,7 @@ create table if not exists public.products (
   sale_price numeric(12,2) check (sale_price is null or sale_price > 0),
   status text not null default 'DRAFT' check (status in ('ACTIVE','DRAFT','HIDDEN','TRASH','OUT_OF_STOCK')),
   availability text not null default 'IN_STOCK' check (availability in ('IN_STOCK','OUT_OF_STOCK')),
-  images jsonb not null default '[]'::jsonb check (jsonb_typeof(images) = 'array' and jsonb_array_length(images) between 0 and 4),
+  images jsonb not null default '[]'::jsonb check (jsonb_typeof(images) = 'array' and jsonb_array_length(images) between 0 and 12),
   primary_image text,
   tags jsonb not null default '[]'::jsonb check (jsonb_typeof(tags) = 'array'),
   featured boolean not null default false,
@@ -50,6 +50,12 @@ create table if not exists public.products (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
+
+-- Make the image limit upgrade-safe for databases created from earlier schema versions.
+alter table public.products drop constraint if exists products_images_check;
+alter table public.products drop constraint if exists products_images_max_12;
+alter table public.products add constraint products_images_max_12
+  check (jsonb_typeof(images) = 'array' and jsonb_array_length(images) between 0 and 12);
 
 create index if not exists products_public_listing_idx
   on public.products (status, category_slug, sort_order);
