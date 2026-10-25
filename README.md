@@ -91,8 +91,8 @@ For a real multi-device commercial catalogue, centralized orders and secure auth
 
 ## Admin redesign V7
 - Admin styling refreshed to a practical premium system: ivory workspace, charcoal sidebar, restrained champagne-gold accents, clearer forms and compact mobile spacing.
-- Product editor supports uploading 1–4 product images directly from the device. Images are resized and compressed in the browser before being stored as data URLs in localStorage.
-- At least one image is required to save a product; no more than four product images may be attached. The first image is the primary image; image order can be changed in the editor.
+- Product editor supports uploading 1–12 product images directly from the device. Images are resized and compressed in the browser before being stored as data URLs in localStorage.
+- At least one image is required to save a product; up to twelve product images may be attached. The first image is the primary image; image order can be changed in the editor.
 - Important static-site limitation: uploaded images and product changes are stored only in the current browser's localStorage. They do not upload files to GitHub Pages or sync to other devices. For public deployment, upload the final optimized image files into the site assets and use their relative paths, or later add centralized storage. Browser localStorage is quota-limited; keep uploads optimized and export a backup regularly.
 
 ## V8 mobile and tablet storefront update
@@ -135,3 +135,14 @@ V23 editorial image refresh: see `RELEASE_NOTES_V23_EDITORIAL_IMAGE_REFRESH.md`.
 
 
 V27 update: legacy saved shipping threshold migration to ₹999 and direct WhatsApp enquiry URL. See RELEASE_NOTES_V27_SHIPPING_WHATSAPP_FIX.md.
+
+
+## Rebuild audit — 2026-10-25
+
+- Publishing: a valid product save now sets status to Active immediately unless the Admin explicitly selects Hidden, Trash, or Out of stock. Incomplete required fields remain saved as Draft with a checklist explanation.
+- Images: product editor, client-side validation, and Supabase schema support 1–12 product images. One image is sufficient to publish; four or more are supported.
+- Catalogue migration: import checks the existing remote catalogue first and skips matching SKUs, preventing seeded/local records from overwriting remote records during the initial migration. Local, backup, and seed records with new SKUs are imported; no product deletion is part of migration.
+- Backup branch: `backup/pre-rebuild-2026-10-25` preserves the pre-rebuild `main` snapshot.
+- Implementation branch: `rebuild/catalogue-publish-on-save`. Changes are isolated from `main` pending review and verification.
+- Audit findings: the repository contains a 24-product seed catalogue and browser-local persistence. Supabase configuration is blank in `supabase-config.js`, so live remote catalogue contents, authentication, storage bucket policies, and actual cross-device publishing cannot be verified from this repository alone. The seed file contains no obvious product names or fields marked test/demo/sample/dummy/placeholder; this is not proof that remote or browser-local test records do not exist.
+- Verification limitation: source-level review only; live Supabase, browser UI, mobile/desktop interaction, and deployment checks require configured credentials and runtime testing.
